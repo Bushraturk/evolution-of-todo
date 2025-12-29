@@ -1,5 +1,5 @@
 /**
- * API client for Todo App backend.
+ * API client for Todo App backend with JWT authentication.
  */
 
 import type {
@@ -10,6 +10,7 @@ import type {
   TaskFilters,
   CreateCategoryRequest,
 } from '@/types/task';
+import { authClient } from '@/lib/auth-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -28,7 +29,22 @@ export class ApiError extends Error {
 }
 
 /**
- * Generic fetch wrapper with error handling.
+ * Get JWT token from Better Auth for API authentication.
+ */
+async function getToken(): Promise<string | null> {
+  try {
+    const result = await authClient.$fetch<{ token?: string }>('/token', {
+      method: 'GET',
+    });
+    return result?.data?.token || null;
+  } catch (error) {
+    console.error('Failed to get auth token:', error);
+    return null;
+  }
+}
+
+/**
+ * Generic fetch wrapper with error handling and JWT authentication.
  */
 async function fetchApi<T>(
   endpoint: string,
@@ -36,12 +52,22 @@ async function fetchApi<T>(
 ): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
+  // Get JWT token for authentication
+  const token = await getToken();
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  // Add Authorization header if token is available
+  if (token) {
+    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {

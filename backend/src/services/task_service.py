@@ -17,6 +17,14 @@ class TaskNotFoundError(Exception):
         super().__init__(f"Task with ID {task_id} not found")
 
 
+class AccessDeniedError(Exception):
+    """Raised when user tries to access a task they don't own."""
+
+    def __init__(self, task_id: UUID) -> None:
+        self.task_id = task_id
+        super().__init__(f"Access denied to task with ID {task_id}")
+
+
 class ValidationError(Exception):
     """Raised when validation fails."""
 
@@ -34,6 +42,7 @@ class TaskService:
 
     def get_all_tasks(
         self,
+        user_id: str,
         search: Optional[str] = None,
         status: Optional[str] = None,
         priority: Optional[Priority] = None,
@@ -41,8 +50,8 @@ class TaskService:
         sort_by: str = "created_at",
         sort_order: str = "desc",
     ) -> List[Task]:
-        """Get all tasks with optional filtering and sorting."""
-        statement = select(Task)
+        """Get all tasks for a specific user with optional filtering and sorting."""
+        statement = select(Task).where(Task.user_id == user_id)
 
         # Apply search filter
         if search:
@@ -74,21 +83,24 @@ class TaskService:
 
         return list(self.session.exec(statement).all())
 
-    def get_task(self, task_id: UUID) -> Task:
-        """Get a single task by ID."""
+    def get_task(self, task_id: UUID, user_id: str) -> Task:
+        """Get a single task by ID, verifying user ownership."""
         task = self.session.get(Task, task_id)
         if not task:
             raise TaskNotFoundError(task_id)
+        if task.user_id != user_id:
+            raise AccessDeniedError(task_id)
         return task
 
     def create_task(
         self,
+        user_id: str,
         title: str,
         description: Optional[str] = None,
         priority: Priority = Priority.MEDIUM,
         category_id: Optional[UUID] = None,
     ) -> Task:
-        """Create a new task."""
+        """Create a new task for a user."""
         # Validate title
         if not title or not title.strip():
             raise ValidationError("title", "Title cannot be empty")
@@ -103,6 +115,7 @@ class TaskService:
             )
 
         task = Task(
+            user_id=user_id,
             title=title.strip(),
             description=description.strip() if description else None,
             priority=priority,
@@ -117,13 +130,14 @@ class TaskService:
     def update_task(
         self,
         task_id: UUID,
+        user_id: str,
         title: Optional[str] = None,
         description: Optional[str] = None,
         priority: Optional[Priority] = None,
         category_id: Optional[UUID] = None,
     ) -> Task:
-        """Update an existing task."""
-        task = self.get_task(task_id)
+        """Update an existing task, verifying user ownership."""
+        task = self.get_task(task_id, user_id)
 
         # Validate title if provided
         if title is not None:
@@ -157,9 +171,9 @@ class TaskService:
         self.session.refresh(task)
         return task
 
-    def toggle_complete(self, task_id: UUID) -> Task:
-        """Toggle task completion status."""
-        task = self.get_task(task_id)
+    def toggle_complete(self, task_id: UUID, user_id: str) -> Task:
+        """Toggle task completion status, verifying user ownership."""
+        task = self.get_task(task_id, user_id)
         task.completed = not task.completed
         task.updated_at = datetime.utcnow()
 
@@ -168,9 +182,9 @@ class TaskService:
         self.session.refresh(task)
         return task
 
-    def delete_task(self, task_id: UUID) -> Task:
-        """Delete a task."""
-        task = self.get_task(task_id)
+    def delete_task(self, task_id: UUID, user_id: str) -> Task:
+        """Delete a task, verifying user ownership."""
+        task = self.get_task(task_id, user_id)
         self.session.delete(task)
         self.session.commit()
         return task

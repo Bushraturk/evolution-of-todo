@@ -10,9 +10,35 @@ This project is part of the "Evolution of Todo" hackathon, showcasing Spec-Drive
 |-------|-------------|--------|
 | Phase I | In-Memory Console App | COMPLETE |
 | Phase II | Full-Stack Web Application | COMPLETE |
-| Phase III | AI-Powered Chatbot | Planned |
-| Phase IV | Local Kubernetes Deployment | Planned |
-| Phase V | Cloud-Native Distributed System | Planned |
+| Phase III | User Authentication & Multi-User Support | COMPLETE |
+| Phase IV | AI-Powered Chatbot | Planned |
+| Phase V | Local Kubernetes Deployment | Planned |
+| Phase VI | Cloud-Native Distributed System | Planned |
+
+## Phase III: User Authentication & Multi-User Support
+
+Secure user authentication enabling multiple users to manage their own tasks.
+
+### Features
+
+**Authentication**:
+- User registration with email/password
+- Secure login/logout
+- Session management with JWT tokens
+- Protected routes and API endpoints
+
+**Multi-User Support**:
+- Task isolation per user
+- User profile display in navigation
+- Automatic redirect for unauthenticated access
+
+### Tech Stack
+
+- **Frontend Auth**: Better Auth + JWT plugin
+- **Backend Auth**: python-jose (JWT verification via JWKS)
+- **Database**: PostgreSQL (Better Auth managed tables)
+
+---
 
 ## Phase II: Full-Stack Web Application
 
@@ -102,7 +128,8 @@ todo-app/
 ├── tests/                   # CLI tests (Phase I)
 ├── specs/                   # Specification documents
 │   ├── 001-console-todo-app/
-│   └── 002-fullstack-webapp/
+│   ├── 002-fullstack-webapp/
+│   └── 003-user-authentication/
 ├── history/                 # Prompt History Records
 └── .specify/                # SpecKit Plus configuration
 ```
