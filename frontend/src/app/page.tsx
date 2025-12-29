@@ -8,6 +8,7 @@ import EditTaskModal from '@/components/EditTaskModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import SearchBar from '@/components/SearchBar';
 import FilterBar from '@/components/FilterBar';
+import UserNav from '@/components/UserNav';
 import { taskApi } from '@/services/api';
 
 export default function Home() {
@@ -82,15 +83,18 @@ export default function Home() {
                 Todo App
               </h1>
               <p className="text-sm text-purple-200">
-                Phase II - Full-Stack Web Application
+                Phase III - Multi-User Support
               </p>
             </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="btn-primary"
-            >
-              {showForm ? 'Cancel' : '+ Add Task'}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="btn-primary"
+              >
+                {showForm ? 'Cancel' : '+ Add Task'}
+              </button>
+              <UserNav />
+            </div>
           </div>
         </div>
       </header>

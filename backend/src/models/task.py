@@ -1,4 +1,4 @@
-"""Task model with Priority enum."""
+"""Task model with Priority enum and user ownership."""
 
 from datetime import datetime
 from enum import Enum
@@ -27,6 +27,7 @@ class TaskBase(SQLModel):
     completed: bool = Field(default=False)
     priority: Priority = Field(default=Priority.MEDIUM)
     category_id: Optional[UUID] = Field(default=None, foreign_key="category.id")
+    user_id: str = Field(index=True)  # User ID from Better Auth (CUID format)
 
 
 class Task(TaskBase, table=True):

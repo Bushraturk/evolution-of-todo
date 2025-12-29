@@ -61,3 +61,5 @@ async def health_check() -> dict:
 # Include routers
 app.include_router(tasks.router)
 app.include_router(categories.router)
+
+# run backend command: uvicorn src.main:app --reload --port 8000
