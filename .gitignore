@@ -57,3 +57,14 @@ Thumbs.db
 
 # UV
 .uv/
+
+# Deployment
+.vercel
+.railway
+
+# Database
+*.db
+*.db-journal
+
+# Additional environment files
+*.env.production

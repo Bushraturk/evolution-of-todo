@@ -22,6 +22,12 @@ class Settings:
         self.cors_origins: List[str] = self._parse_cors_origins()
         self.debug: bool = os.getenv("DEBUG", "true").lower() == "true"
 
+        # JWT settings for authentication
+        self.jwt_secret: str = os.getenv(
+            "JWT_SECRET",
+            "your-secret-key-at-least-32-characters-here"  # fallback for dev
+        )
+
     def _parse_cors_origins(self) -> List[str]:
         """Parse CORS origins from comma-separated string."""
         origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")
