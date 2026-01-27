@@ -19,7 +19,7 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-purple-950/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-purple-900/90 rounded-2xl shadow-2xl max-w-sm w-full p-6 border-2 border-purple-200 dark:border-purple-700">
+      <div className="glass-strong rounded-2xl shadow-2xl max-w-sm w-full p-6">
         <h2 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
           {title}
         </h2>

@@ -2,6 +2,7 @@
 
 from .category import Category, CategoryBase
 from .task import Priority, Task, TaskBase
+from .user import User
 
 __all__ = [
     "Category",
@@ -9,4 +10,5 @@ __all__ = [
     "Priority",
     "Task",
     "TaskBase",
+    "User",
 ]

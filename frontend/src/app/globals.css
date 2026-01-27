@@ -70,4 +70,80 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Glassmorphism utilities */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.15);
+  }
+
+  .glass-dark {
+    background: rgba(30, 27, 75, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+  }
+
+  /* Animated gradient background */
+  .landing-bg {
+    background: linear-gradient(135deg,
+      #faf5ff 0%, #f3e8ff 25%, #e9d5ff 50%,
+      #ddd6fe 75%, #c4b5fd 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    animation: float 20s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-20px, 20px) rotate(5deg); }
+  }
+
+  /* Dark mode glass */
+  @media (prefers-color-scheme: dark) {
+    .glass {
+      background: rgba(30, 27, 75, 0.3);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+    }
+    .glass-strong {
+      background: rgba(30, 27, 75, 0.5);
+      border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+    .glass-card {
+      background: rgba(30, 27, 75, 0.4);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+    }
+    .landing-bg {
+      background: linear-gradient(135deg,
+        #1e1b4b 0%, #2e1065 25%, #4c1d95 50%,
+        #5b21b6 75%, #6d28d9 100%);
+    }
+  }
 }

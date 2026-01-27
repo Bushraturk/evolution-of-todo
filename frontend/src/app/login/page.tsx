@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AuthForm, { AuthFormData } from '@/components/AuthForm';
-import { authClient } from '@/lib/auth-client';
+import { signIn } from '@/lib/auth-client';
 
 function LoginContent() {
   const router = useRouter();
@@ -26,27 +26,15 @@ function LoginContent() {
     setError(null);
 
     try {
-      const result = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
-      });
+      const result = await signIn(data.email, data.password);
 
       if (result.error) {
-        // Handle specific error messages
-        if (
-          result.error.message?.toLowerCase().includes('invalid') ||
-          result.error.message?.toLowerCase().includes('credentials') ||
-          result.error.message?.toLowerCase().includes('password')
-        ) {
-          setError('Invalid email or password');
-        } else {
-          setError(result.error.message || 'Login failed. Please try again.');
-        }
+        setError('Invalid email or password');
         return;
       }
 
       // Login successful - redirect to dashboard
-      router.push('/');
+      router.push('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
       setError('An unexpected error occurred. Please try again.');
@@ -76,7 +64,7 @@ function LoginContent() {
         )}
 
         {/* Form Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-purple-100 dark:border-purple-900">
+        <div className="glass-strong rounded-2xl shadow-xl p-8">
           <AuthForm
             mode="login"
             onSubmit={handleLogin}
@@ -98,13 +86,13 @@ function LoginContent() {
           </div>
         </div>
 
-        {/* Back to App */}
+        {/* Back to Home */}
         <div className="mt-8 text-center">
           <Link
             href="/"
             className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
           >
-            &larr; Back to app
+            &larr; Back to home
           </Link>
         </div>
       </div>

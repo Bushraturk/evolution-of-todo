@@ -58,7 +58,7 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card">
+    <form onSubmit={handleSubmit} className="glass-card">
       <h2 className="text-lg font-semibold mb-4 text-purple-900 dark:text-purple-100">Add New Task</h2>
 
       {error && (

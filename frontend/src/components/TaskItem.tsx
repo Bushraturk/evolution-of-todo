@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { Task } from '@/types/task';
 import { taskApi } from '@/services/api';
 
@@ -35,8 +36,9 @@ export default function TaskItem({ task, onUpdate, onEdit, onDelete }: TaskItemP
   };
 
   return (
-    <div
-      className={`card flex items-start gap-4 transition-opacity ${
+    <motion.div
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className={`glass-card flex items-start gap-4 transition-opacity ${
         task.completed ? 'opacity-60' : ''
       }`}
     >
@@ -121,6 +123,6 @@ export default function TaskItem({ task, onUpdate, onEdit, onDelete }: TaskItemP
           </svg>
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,9 +1,10 @@
 /**
  * Better Auth API route handler.
- * Handles all /api/auth/* requests.
+ * This handles all Better Auth endpoints including JWKS.
+ * Note: We're using custom JWT authentication for the app,
+ * but Better Auth is kept for potential future use.
  */
 
 import { auth } from "@/lib/auth";
-import { toNextJsHandler } from "better-auth/next-js";
 
-export const { GET, POST } = toNextJsHandler(auth);
+export const { GET, POST } = auth.handler;

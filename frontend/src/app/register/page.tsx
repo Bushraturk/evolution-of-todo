@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthForm, { AuthFormData } from '@/components/AuthForm';
-import { authClient } from '@/lib/auth-client';
+import { signUp } from '@/lib/auth-client';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,24 +16,19 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const result = await authClient.signUp.email({
-        email: data.email,
-        password: data.password,
-        name: data.name || '',
-      });
+      const result = await signUp(data.email, data.password, data.name || '');
 
       if (result.error) {
-        // Handle specific error messages
-        if (result.error.message?.toLowerCase().includes('already')) {
+        if (result.error.toLowerCase().includes('already')) {
           setError('An account with this email already exists');
         } else {
-          setError(result.error.message || 'Registration failed. Please try again.');
+          setError(result.error || 'Registration failed. Please try again.');
         }
         return;
       }
 
       // Registration successful - redirect to dashboard
-      router.push('/');
+      router.push('/dashboard');
     } catch (err) {
       console.error('Registration error:', err);
       setError('An unexpected error occurred. Please try again.');
@@ -56,7 +51,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-8 border border-purple-100 dark:border-purple-900">
+        <div className="glass-strong rounded-2xl shadow-xl p-8">
           <AuthForm
             mode="register"
             onSubmit={handleRegister}

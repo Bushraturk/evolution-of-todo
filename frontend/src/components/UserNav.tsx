@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient, useSession } from '@/lib/auth-client';
+import { useSession, signOut } from '@/lib/auth-client';
 
 export default function UserNav() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function UserNav() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await authClient.signOut();
+      await signOut();
       router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -84,7 +84,7 @@ export default function UserNav() {
           ></div>
 
           {/* Menu */}
-          <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-purple-100 dark:border-purple-900 z-20 overflow-hidden">
+          <div className="absolute right-0 mt-2 w-64 glass-strong rounded-xl shadow-xl z-20 overflow-hidden">
             {/* User Info */}
             <div className="px-4 py-3 bg-gradient-to-r from-purple-50 to-fuchsia-50 dark:from-purple-900/30 dark:to-fuchsia-900/30 border-b border-purple-100 dark:border-purple-800">
               <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">

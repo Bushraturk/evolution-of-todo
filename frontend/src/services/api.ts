@@ -10,7 +10,6 @@ import type {
   TaskFilters,
   CreateCategoryRequest,
 } from '@/types/task';
-import { authClient } from '@/lib/auth-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -29,18 +28,13 @@ export class ApiError extends Error {
 }
 
 /**
- * Get JWT token from Better Auth for API authentication.
+ * Get JWT token from localStorage.
  */
-async function getToken(): Promise<string | null> {
-  try {
-    const result = await authClient.$fetch<{ token?: string }>('/token', {
-      method: 'GET',
-    });
-    return result?.data?.token || null;
-  } catch (error) {
-    console.error('Failed to get auth token:', error);
-    return null;
+function getToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth_token');
   }
+  return null;
 }
 
 /**
@@ -52,8 +46,7 @@ async function fetchApi<T>(
 ): Promise<T> {
   const url = `${API_URL}${endpoint}`;
 
-  // Get JWT token for authentication
-  const token = await getToken();
+  const token = getToken();
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -76,7 +69,6 @@ async function fetchApi<T>(
       const errorData = await response.json();
       errorMessage = errorData.detail || errorMessage;
     } catch {
-      // Use status text if JSON parsing fails
       errorMessage = response.statusText || errorMessage;
     }
     throw new ApiError(errorMessage, response.status);

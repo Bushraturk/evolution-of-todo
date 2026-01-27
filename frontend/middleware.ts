@@ -2,39 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware to protect routes that require authentication.
- * Redirects unauthenticated users to the login page.
+ * Middleware for custom JWT authentication.
+ * Since JWT tokens are stored in localStorage (client-side only),
+ * we can't check authentication here. Auth checks are handled client-side.
+ * This middleware is kept minimal for future server-side auth enhancements.
  */
 export function middleware(request: NextRequest) {
-  // Get the session token from cookies
-  // Better Auth uses 'better-auth.session_token' cookie
-  const sessionToken = request.cookies.get('better-auth.session_token');
-
-  // Define protected paths
-  const protectedPaths = ['/'];
-  const isProtectedPath = protectedPaths.some(
-    (path) => request.nextUrl.pathname === path
-  );
-
-  // Define auth paths (login, register)
-  const authPaths = ['/login', '/register'];
-  const isAuthPath = authPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
-
-  // Redirect authenticated users away from auth pages
-  if (isAuthPath && sessionToken) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  // Redirect unauthenticated users to login
-  if (isProtectedPath && !sessionToken) {
-    const loginUrl = new URL('/login', request.url);
-    // Add a message parameter for better UX
-    loginUrl.searchParams.set('message', 'Please sign in to continue');
-    return NextResponse.redirect(loginUrl);
-  }
-
+  // For now, allow all requests through
+  // Client-side code handles authentication checks and redirects
   return NextResponse.next();
 }
 

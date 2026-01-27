@@ -16,6 +16,7 @@ dependencies = [
     "psycopg2-binary>=2.9.9",
     "PyJWT[crypto]>=2.8.0",
     "httpx>=0.26.0",
+    "passlib[bcrypt]>=1.7.4",
 ]
 
 [project.optional-dependencies]

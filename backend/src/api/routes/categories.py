@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from ...auth.dependencies import get_current_user
+from ..routes.auth import get_current_user
 from ...database import get_session
 from ...schemas.category import (
     CategoryListResponse,

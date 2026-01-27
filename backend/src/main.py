@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.routes import categories, tasks
+from .api.routes import categories, tasks, auth
 from .config import get_settings
 from .database import init_db
 
@@ -61,5 +61,6 @@ async def health_check() -> dict:
 # Include routers
 app.include_router(tasks.router)
 app.include_router(categories.router)
+app.include_router(auth.router)
 
-# run backend command: uvicorn src.main:app --reload --port 8000
+# run backend command: uvicorn src.main:app --reload --port 8001

@@ -44,7 +44,7 @@ def get_session() -> Generator[Session, None, None]:
 def init_db() -> None:
     """Initialize the database with tables."""
     # Import models to register them with SQLModel
-    from .models import Category, Task  # noqa: F401
+    from .models import Category, Task, User  # noqa: F401
 
     create_db_and_tables()
     print("INFO: Database tables created successfully")
