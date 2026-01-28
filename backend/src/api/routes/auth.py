@@ -96,62 +96,88 @@ class UserResponse(BaseModel):
 @router.post("/login", response_model=TokenResponse)
 async def login(request: LoginRequest, session=Depends(get_session)):
     """Login with email and password."""
-    # Find user by email
-    stmt = select(User).where(User.email == request.email)
-    result = session.exec(stmt)
-    user = result.first()
+    try:
+        # Find user by email
+        stmt = select(User).where(User.email == request.email)
+        result = session.exec(stmt)
+        user = result.first()
 
-    if not user or not verify_password(request.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+        if not user or not verify_password(request.password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+
+        # Create access token
+        access_token = create_access_token(
+            data={"sub": str(user.id), "email": user.email, "name": user.name}
         )
 
-    # Create access token
-    access_token = create_access_token(
-        data={"sub": str(user.id), "email": user.email, "name": user.name}
-    )
-
-    return TokenResponse(
-        access_token=access_token,
-        user={"id": str(user.id), "email": user.email, "name": user.name},
-    )
+        return TokenResponse(
+            access_token=access_token,
+            user={"id": str(user.id), "email": user.email, "name": user.name},
+        )
+    except HTTPException:
+        # Re-raise HTTP exceptions (like invalid credentials)
+        raise
+    except Exception as e:
+        # Log the error and return a generic message
+        print(f"ERROR in login endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Login failed: {str(e)}",
+        )
 
 
 @router.post("/register", response_model=TokenResponse)
 async def register(request: RegisterRequest, session=Depends(get_session)):
     """Register a new user."""
-    # Check if user already exists
-    stmt = select(User).where(User.email == request.email)
-    result = session.exec(stmt)
-    existing_user = result.first()
+    try:
+        # Check if user already exists
+        stmt = select(User).where(User.email == request.email)
+        result = session.exec(stmt)
+        existing_user = result.first()
 
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="An account with this email already exists",
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="An account with this email already exists",
+            )
+
+        # Create new user
+        user = User(
+            id=uuid4(),
+            email=request.email,
+            name=request.name,
+            hashed_password=get_password_hash(request.password),
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+        # Create access token
+        access_token = create_access_token(
+            data={"sub": str(user.id), "email": user.email, "name": user.name}
         )
 
-    # Create new user
-    user = User(
-        id=uuid4(),
-        email=request.email,
-        name=request.name,
-        hashed_password=get_password_hash(request.password),
-    )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-
-    # Create access token
-    access_token = create_access_token(
-        data={"sub": str(user.id), "email": user.email, "name": user.name}
-    )
-
-    return TokenResponse(
-        access_token=access_token,
-        user={"id": str(user.id), "email": user.email, "name": user.name},
-    )
+        return TokenResponse(
+            access_token=access_token,
+            user={"id": str(user.id), "email": user.email, "name": user.name},
+        )
+    except HTTPException:
+        # Re-raise HTTP exceptions (like duplicate email)
+        raise
+    except Exception as e:
+        # Log the error and return a generic message
+        print(f"ERROR in register endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {str(e)}",
+        )
 
 
 @router.get("/me", response_model=UserResponse)
@@ -160,40 +186,53 @@ async def get_me(
     session=Depends(get_session),
 ):
     """Get current user from token."""
-    token = credentials.credentials
-    payload = decode_token(token)
-
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token payload",
-        )
-
-    # Fetch user from database
     try:
-        user_uuid = UUID(user_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid user ID in token",
+        token = credentials.credentials
+        payload = decode_token(token)
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+            )
+
+        # Fetch user from database
+        try:
+            user_uuid = UUID(user_id)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid user ID in token",
+            )
+
+        stmt = select(User).where(User.id == user_uuid)
+        result = session.exec(stmt)
+        user = result.first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+            )
+
+        return UserResponse(
+            id=str(user.id),
+            email=user.email,
+            name=user.name,
         )
-
-    stmt = select(User).where(User.id == user_uuid)
-    result = session.exec(stmt)
-    user = result.first()
-
-    if not user:
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        # Log the error and return a generic message
+        print(f"ERROR in get_me endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get user: {str(e)}",
         )
-
-    return UserResponse(
-        id=str(user.id),
-        email=user.email,
-        name=user.name,
-    )
 
 
 async def get_current_user(
