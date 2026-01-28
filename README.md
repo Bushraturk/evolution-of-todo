@@ -15,6 +15,30 @@ This project is part of the "Evolution of Todo" hackathon, showcasing Spec-Drive
 | Phase V | Local Kubernetes Deployment | Planned |
 | Phase VI | Cloud-Native Distributed System | Planned |
 
+## 🚀 Production Deployment
+
+**Status:** Ready for deployment (security hardened, code cleaned)
+
+**Quick Deploy:**
+1. Open `START_HERE.md` for deployment overview
+2. Follow `DEPLOY_NOW.md` for backend (Hugging Face Spaces)
+3. Follow `DEPLOY_FRONTEND.md` for frontend (Vercel)
+4. See `DEPLOYMENT_RECORD.md` for deployment tracking
+
+**Production URLs:** (To be filled after deployment)
+- **Frontend:** [Vercel URL pending]
+- **Backend API:** [Hugging Face URL pending]
+- **API Docs:** [Backend URL]/docs
+
+**Deployment Platforms:**
+- Backend: Hugging Face Spaces (Docker, FREE tier)
+- Frontend: Vercel (Next.js, FREE tier)
+- Database: Neon DB PostgreSQL (already configured)
+
+**Security:** All secrets rotated and redacted from documentation. Use `.secrets.production.txt` for deployment (gitignored).
+
+---
+
 ## Phase III: User Authentication & Multi-User Support
 
 Secure user authentication enabling multiple users to manage their own tasks.
