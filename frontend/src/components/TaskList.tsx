@@ -22,9 +22,7 @@ export default function TaskList({ filters, onEdit, onDelete, refreshTrigger }: 
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching tasks with filters:', filters);
       const data = await taskApi.getAll(filters);
-      console.log('Tasks received:', data);
       setTasks(data || []);
     } catch (err) {
       console.error('Failed to fetch tasks:', err);

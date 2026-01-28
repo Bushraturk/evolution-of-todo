@@ -81,8 +81,9 @@ Value: [YOUR HUGGING FACE BACKEND URL]
 ### Variable 2: Better Auth Secret
 ```
 Name: BETTER_AUTH_SECRET
-Value: 84476a02f1a5c65ae889d6bc950a3ec8de250723632c06d17bf547201756e31e
+Value: [YOUR_GENERATED_BETTER_AUTH_SECRET]
 ```
+**Get from:** `.secrets.production.txt` file (BETTER_AUTH_SECRET)
 
 ### Variable 3: Better Auth URL (Temporary)
 ```
@@ -94,8 +95,9 @@ Value: https://your-project.vercel.app
 ### Variable 4: Database URL
 ```
 Name: DATABASE_URL
-Value: postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+Value: [YOUR_NEON_DB_CONNECTION_STRING]
 ```
+**Get from:** `.secrets.production.txt` file (DATABASE_URL)
 
 ---
 

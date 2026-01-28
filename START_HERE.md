@@ -92,9 +92,9 @@ All code changes, configuration files, and documentation are complete. You can d
 
 ### For Hugging Face (Backend)
 ```bash
-DATABASE_URL=postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=[YOUR_NEON_DB_CONNECTION_STRING]
 
-JWT_SECRET=1e2d3b277e18b3a2bc2f590c5c949b327e28cbf69f2869d7d0757f3c36746249
+JWT_SECRET=[YOUR_GENERATED_JWT_SECRET]
 
 CORS_ORIGINS=http://localhost:3000
 # Update after getting Vercel URL
@@ -107,13 +107,15 @@ DEBUG=false
 NEXT_PUBLIC_API_URL=https://YOUR-USERNAME-todo-app-backend.hf.space
 # Use your actual Hugging Face URL
 
-BETTER_AUTH_SECRET=84476a02f1a5c65ae889d6bc950a3ec8de250723632c06d17bf547201756e31e
+BETTER_AUTH_SECRET=[YOUR_GENERATED_BETTER_AUTH_SECRET]
 
 BETTER_AUTH_URL=https://YOUR-PROJECT.vercel.app
 # Update after deployment
 
-DATABASE_URL=postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=[YOUR_NEON_DB_CONNECTION_STRING]
 ```
+
+**Note:** Check `.secrets.production.txt` file for your generated secrets (DO NOT commit this file).
 
 ---
 

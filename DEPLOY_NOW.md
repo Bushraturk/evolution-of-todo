@@ -65,14 +65,17 @@ C:\Users\admin\Desktop\b-todo-app\evolution-of-todo\backend\
 ### Secret 1:
 ```
 Name: DATABASE_URL
-Value: postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+Value: [YOUR_NEON_DB_CONNECTION_STRING]
 ```
+**Get from:** `.secrets.production.txt` file (DATABASE_URL)
 
 ### Secret 2:
 ```
 Name: JWT_SECRET
-Value: 1e2d3b277e18b3a2bc2f590c5c949b327e28cbf69f2869d7d0757f3c36746249
+Value: [GENERATE_NEW_SECRET]
 ```
+**Generate with:** `python -c "import secrets; print(secrets.token_hex(32))"`
+**Or get from:** `.secrets.production.txt` file (JWT_SECRET)
 
 ### Secret 3:
 ```

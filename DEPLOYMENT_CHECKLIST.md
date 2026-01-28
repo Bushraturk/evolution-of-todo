@@ -38,9 +38,9 @@
 In Space Settings → Repository secrets, add:
 
 ```
-DATABASE_URL = postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL = [YOUR_NEON_DB_CONNECTION_STRING]
 
-JWT_SECRET = 1e2d3b277e18b3a2bc2f590c5c949b327e28cbf69f2869d7d0757f3c36746249
+JWT_SECRET = [GENERATE_WITH: python -c "import secrets; print(secrets.token_hex(32))"]
 
 CORS_ORIGINS = http://localhost:3000
 
@@ -74,11 +74,11 @@ Backend URL: https://_____________________________.hf.space
 ```
 NEXT_PUBLIC_API_URL = [YOUR BACKEND URL FROM STEP 1.4]
 
-BETTER_AUTH_SECRET = 84476a02f1a5c65ae889d6bc950a3ec8de250723632c06d17bf547201756e31e
+BETTER_AUTH_SECRET = [GENERATE_WITH: python -c "import secrets; print(secrets.token_hex(32))"]
 
 BETTER_AUTH_URL = https://YOUR_PROJECT_NAME.vercel.app
 
-DATABASE_URL = postgresql://neondb_owner:npg_DJvwsZ97ikxH@ep-delicate-hill-adi5oaai-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL = [YOUR_NEON_DB_CONNECTION_STRING]
 ```
 
 ### 2.3 Deploy

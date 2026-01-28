@@ -10,8 +10,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -68,3 +68,8 @@ Thumbs.db
 
 # Additional environment files
 *.env.production
+
+# Production secrets (NEVER commit)
+.secrets.production.txt
+db_check_output.txt
+nul
