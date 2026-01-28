@@ -7,4 +7,6 @@
 
 import { auth } from "@/lib/auth";
 
-export const { GET, POST } = auth.handler;
+// Better Auth handler for Next.js App Router
+export const GET = auth.handler;
+export const POST = auth.handler;
