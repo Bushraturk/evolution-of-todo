@@ -1,0 +1,319 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/tool-definition.json",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "add_task",
+      "description": "Create a new task for the user. Use this when the user wants to add, create, or remember something.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["user_id", "title"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user creating the task"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Task title (what needs to be done)"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Optional detailed description of the task"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["task_id", "status", "title"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the created task"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["created"],
+            "description": "Operation status"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the created task"
+          }
+        }
+      },
+      "examples": [
+        {
+          "input": {
+            "user_id": "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2",
+            "title": "Buy groceries",
+            "description": "Milk, eggs, bread"
+          },
+          "output": {
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+            "status": "created",
+            "title": "Buy groceries"
+          }
+        }
+      ]
+    },
+    {
+      "name": "list_tasks",
+      "description": "Retrieve tasks from the user's task list. Use this when the user wants to see, show, or list their tasks.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["user_id"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user whose tasks to retrieve"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["all", "pending", "completed"],
+            "default": "all",
+            "description": "Filter tasks by completion status"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["id", "title", "completed"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Task identifier"
+            },
+            "title": {
+              "type": "string",
+              "description": "Task title"
+            },
+            "description": {
+              "type": "string",
+              "description": "Task description (if provided)"
+            },
+            "completed": {
+              "type": "boolean",
+              "description": "Whether task is completed"
+            },
+            "priority": {
+              "type": "string",
+              "enum": ["high", "medium", "low"],
+              "description": "Task priority level"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When task was created"
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "input": {
+            "user_id": "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2",
+            "status": "pending"
+          },
+          "output": [
+            {
+              "id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+              "title": "Buy groceries",
+              "description": "Milk, eggs, bread",
+              "completed": false,
+              "priority": "high",
+              "created_at": "2026-01-29T06:13:13.730630"
+            },
+            {
+              "id": "456def78-1234-5678-90ab-cdef12345678",
+              "title": "Call mom",
+              "completed": false,
+              "priority": "medium",
+              "created_at": "2026-01-28T14:22:10.123456"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "complete_task",
+      "description": "Mark a task as complete. Use this when the user says they finished, completed, or are done with a task.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["user_id", "task_id"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user who owns the task"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the task to mark as complete"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["task_id", "status", "title"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the completed task"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed"],
+            "description": "Operation status"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the completed task"
+          }
+        }
+      },
+      "examples": [
+        {
+          "input": {
+            "user_id": "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2",
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261"
+          },
+          "output": {
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+            "status": "completed",
+            "title": "Buy groceries"
+          }
+        }
+      ]
+    },
+    {
+      "name": "delete_task",
+      "description": "Remove a task from the user's list. Use this when the user wants to delete, remove, or cancel a task.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["user_id", "task_id"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user who owns the task"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the task to delete"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["task_id", "status", "title"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the deleted task"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["deleted"],
+            "description": "Operation status"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the deleted task"
+          }
+        }
+      },
+      "examples": [
+        {
+          "input": {
+            "user_id": "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2",
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261"
+          },
+          "output": {
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+            "status": "deleted",
+            "title": "Buy groceries"
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_task",
+      "description": "Modify a task's title or description. Use this when the user wants to change, update, or rename a task.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["user_id", "task_id"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user who owns the task"
+          },
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the task to update"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "New task title (optional)"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "New task description (optional)"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["task_id", "status", "title"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the updated task"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["updated"],
+            "description": "Operation status"
+          },
+          "title": {
+            "type": "string",
+            "description": "Updated task title"
+          }
+        }
+      },
+      "examples": [
+        {
+          "input": {
+            "user_id": "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2",
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+            "title": "Buy groceries and fruits"
+          },
+          "output": {
+            "task_id": "323fc8dc-e29e-4868-aa93-8351ff5f6261",
+            "status": "updated",
+            "title": "Buy groceries and fruits"
+          }
+        }
+      ]
+    }
+  ]
+}
