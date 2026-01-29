@@ -4,10 +4,10 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
+import bcrypt
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 from sqlmodel import select
 
@@ -17,8 +17,7 @@ from ...models.user import User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
 
 # JWT settings
 settings = get_settings()
@@ -26,17 +25,21 @@ SECRET_KEY = settings.jwt_secret
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
-security = HTTPBearer()
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against a hash."""
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify a password against a hash using bcrypt directly."""
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
 def get_password_hash(password: str) -> str:
-    """Hash a password."""
-    return pwd_context.hash(password)
+    """Hash a password using bcrypt directly (avoids passlib issues)."""
+    # Bcrypt has a 72-byte limit - truncate at byte level
+    password_bytes = password.encode('utf-8')[:72]
+    # Generate salt and hash
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    # Return as string
+    return hashed.decode('utf-8')
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -80,6 +83,14 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     name: Optional[str] = None
+
+    def validate_password(self):
+        """Validate password meets requirements."""
+        if len(self.password) > 72:
+            raise ValueError("Password must be 72 characters or less")
+        if len(self.password) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return self.password
 
 
 class TokenResponse(BaseModel):
@@ -135,6 +146,15 @@ async def login(request: LoginRequest, session=Depends(get_session)):
 async def register(request: RegisterRequest, session=Depends(get_session)):
     """Register a new user."""
     try:
+        # Validate password
+        try:
+            request.validate_password()
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
         # Check if user already exists
         stmt = select(User).where(User.email == request.email)
         result = session.exec(stmt)
@@ -146,7 +166,7 @@ async def register(request: RegisterRequest, session=Depends(get_session)):
                 detail="An account with this email already exists",
             )
 
-        # Create new user
+        # Create new user - password hashing handles truncation internally
         user = User(
             id=uuid4(),
             email=request.email,

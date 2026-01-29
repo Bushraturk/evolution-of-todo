@@ -73,3 +73,8 @@ Thumbs.db
 .secrets.production.txt
 db_check_output.txt
 nul
+
+# Temporary deployment scripts with tokens
+upload_fixed.py
+upload_to_hf.py
+test_register.json
