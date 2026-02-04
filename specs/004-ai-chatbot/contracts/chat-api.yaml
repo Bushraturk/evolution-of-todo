@@ -52,7 +52,7 @@ paths:
               existingConversation:
                 summary: Continue conversation
                 value:
-                  conversation_id: 123
+                  conversation_id: "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2"
                   message: "Show me all my tasks"
       responses:
         '200':
@@ -65,7 +65,7 @@ paths:
                 taskCreated:
                   summary: Task creation confirmed
                   value:
-                    conversation_id: 123
+                    conversation_id: "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2"
                     response: "I've created a task titled 'Buy groceries' for you. Is there anything else you'd like to add?"
                     tool_calls:
                       - tool: "add_task"
@@ -79,7 +79,7 @@ paths:
                 taskList:
                   summary: Task list displayed
                   value:
-                    conversation_id: 123
+                    conversation_id: "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2"
                     response: "You have 3 pending tasks:\n1. Buy groceries\n2. Call mom\n3. Pay bills"
                     tool_calls:
                       - tool: "list_tasks"
@@ -152,10 +152,10 @@ components:
         - message
       properties:
         conversation_id:
-          type: integer
+          type: string
           description: |
             Existing conversation ID to continue. Omit to start a new conversation.
-          example: 123
+          example: "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2"
         message:
           type: string
           description: User's natural language message
@@ -171,9 +171,9 @@ components:
         - tool_calls
       properties:
         conversation_id:
-          type: integer
+          type: string
           description: Conversation ID for this session (use in subsequent requests)
-          example: 123
+          example: "d17cb5d1-5a51-4f2f-9cb8-8cd7f19720e2"
         response:
           type: string
           description: AI assistant's natural language response

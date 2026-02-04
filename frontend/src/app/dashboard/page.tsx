@@ -10,6 +10,8 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import SearchBar from '@/components/SearchBar';
 import FilterBar from '@/components/FilterBar';
 import UserNav from '@/components/UserNav';
+import ChatbotButton from '@/components/ChatbotButton';
+import ChatbotModal from '@/components/ChatbotModal';
 import { taskApi } from '@/services/api';
 import { useSession } from '@/lib/auth-client';
 
@@ -23,6 +25,7 @@ export default function Dashboard() {
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [filters, setFilters] = useState<TaskFilters>({});
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   // Define all callback hooks at the top level (before any returns)
   const handleRefresh = useCallback(() => {
@@ -181,6 +184,15 @@ export default function Dashboard() {
           onCancel={handleDeleteCancel}
         />
       )}
+
+      {/* AI Chatbot Button */}
+      <ChatbotButton onClick={() => setIsChatbotOpen(true)} />
+
+      {/* AI Chatbot Modal */}
+      <ChatbotModal
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
     </div>
   );
 }

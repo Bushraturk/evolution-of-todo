@@ -53,6 +53,29 @@ This document defines the data model for the AI-powered chatbot feature. The mod
 
 ---
 
+## Type Decisions
+
+### User ID Format
+- **Type**: `VARCHAR(255)` (string)
+- **Format**: CUID from Better Auth
+- **Rationale**: Main backend uses Better Auth which generates CUID strings, not UUIDs
+- **Impact**:
+  - All chatbot models use `user_id: str` instead of UUID
+  - No foreign key constraint to user table (different backend)
+  - User ID passed as string from JWT token
+  - Conversation ID remains UUID (internal to chatbot backend)
+
+### Conversation ID Format
+- **Type**: `UUID` (internal to chatbot backend)
+- **API Format**: String representation of UUID
+- **Rationale**: Chatbot backend manages its own conversation IDs independently
+- **Impact**:
+  - Database stores as UUID for efficiency
+  - API accepts/returns string representation
+  - Frontend treats as opaque string identifier
+
+---
+
 ## New Entities
 
 ### 1. Conversation

@@ -30,6 +30,17 @@ function getToken(): string | null {
 function setToken(token: string): void {
   if (typeof window !== "undefined") {
     localStorage.setItem("auth_token", token);
+
+    // Also decode and save userId for chatbot
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const userId = payload.sub || payload.user_id || payload.id;
+      if (userId) {
+        localStorage.setItem("userId", userId);
+      }
+    } catch (e) {
+      console.error('Failed to decode token for userId:', e);
+    }
   }
 }
 
@@ -37,6 +48,8 @@ function setToken(token: string): void {
 function removeToken(): void {
   if (typeof window !== "undefined") {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("conversationId");
   }
 }
 
