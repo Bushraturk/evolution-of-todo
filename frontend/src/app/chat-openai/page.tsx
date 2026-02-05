@@ -93,9 +93,10 @@ export default function ChatOpenAIPage() {
         console.log('Tools used:', data.tool_calls);
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Chat error:', err);
-      setError(err.message || 'Failed to send message');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
+      setError(errorMessage);
       // Remove the user message that failed
       setMessages(prev => prev.slice(0, -1));
     } finally {
@@ -160,19 +161,19 @@ export default function ChatOpenAIPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl mx-auto">
                   <div className="bg-white p-4 rounded-lg border border-gray-200 text-left">
                     <p className="text-sm font-medium text-gray-900">Create tasks</p>
-                    <p className="text-sm text-gray-600 mt-1">"Add a task to buy groceries"</p>
+                    <p className="text-sm text-gray-600 mt-1">&quot;Add a task to buy groceries&quot;</p>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200 text-left">
                     <p className="text-sm font-medium text-gray-900">View tasks</p>
-                    <p className="text-sm text-gray-600 mt-1">"Show me all my tasks"</p>
+                    <p className="text-sm text-gray-600 mt-1">&quot;Show me all my tasks&quot;</p>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200 text-left">
                     <p className="text-sm font-medium text-gray-900">Complete tasks</p>
-                    <p className="text-sm text-gray-600 mt-1">"Mark task 3 as complete"</p>
+                    <p className="text-sm text-gray-600 mt-1">&quot;Mark task 3 as complete&quot;</p>
                   </div>
                   <div className="bg-white p-4 rounded-lg border border-gray-200 text-left">
                     <p className="text-sm font-medium text-gray-900">Update tasks</p>
-                    <p className="text-sm text-gray-600 mt-1">"Change task 1 to 'Call mom'"</p>
+                    <p className="text-sm text-gray-600 mt-1">&quot;Change task 1 to &apos;Call mom&apos;&quot;</p>
                   </div>
                 </div>
               </div>
