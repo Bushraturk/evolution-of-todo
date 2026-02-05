@@ -1,21 +1,14 @@
 """Simple task operations wrapper for chatbot backend.
 
-This module provides basic task operations without importing from main backend.
+This module provides basic task operations using the local Task model.
 It directly uses SQLModel to interact with the database.
 """
 import logging
-import sys
-from pathlib import Path
 from typing import List, Optional
 
 from sqlmodel import Session, select, and_
 
-# Add main backend to path once at module level
-BACKEND_PATH = Path(__file__).resolve().parents[4] / "backend" / "src"
-if str(BACKEND_PATH) not in sys.path:
-    sys.path.insert(0, str(BACKEND_PATH))
-
-from models.task import Task
+from ..models.task import Task
 
 logger = logging.getLogger(__name__)
 
