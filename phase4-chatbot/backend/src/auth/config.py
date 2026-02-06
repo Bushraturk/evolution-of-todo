@@ -12,8 +12,13 @@ load_dotenv()
 class AuthConfig:
     """Authentication configuration from environment variables."""
 
-    jwt_secret: str = os.getenv("JWT_SECRET", "your-secret-key-at-least-32-characters-here")
-    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    jwks_url: str = os.getenv("JWKS_URL", "http://localhost:3000/api/auth/jwks")
+    jwt_issuer: str = os.getenv("JWT_ISSUER", "http://localhost:3000")
+    jwt_algorithms: list[str] = None
+
+    def __post_init__(self):
+        if self.jwt_algorithms is None:
+            self.jwt_algorithms = ["EdDSA", "RS256"]
 
 
 # Global config instance
