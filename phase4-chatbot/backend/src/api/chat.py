@@ -15,7 +15,7 @@ from sqlmodel import Session
 from ..auth.dependencies import get_current_user
 from ..database import get_session
 from ..models import MessageRole
-from ..services.agent_service import (
+from ..services.agent_service_gemini import (
     AgentService,
     AgentRateLimitError,
     AgentAPIError,
@@ -105,12 +105,11 @@ async def chat(
         task_ops = TaskOperations(session)
         task_handlers = TaskHandlers(task_ops)
 
-        # Initialize AgentService with proper Agents SDK
+        # Initialize AgentService with native Gemini SDK
         agent_service = AgentService(
             mcp_handlers=task_handlers,
             api_key=os.getenv("GEMINI_API_KEY"),
-            base_url=os.getenv("GEMINI_BASE_URL"),
-            model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+            model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )

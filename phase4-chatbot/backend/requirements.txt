@@ -1,10 +1,11 @@
 # Core dependencies
 fastapi
-uvicorn[standard] 
-openai 
-mcp 
+uvicorn[standard]
+openai
+google-generativeai
+mcp
 sqlmodel
-psycopg2-binary 
+psycopg2-binary
 tenacity 
 
 # Authentication (reuse from Phase III)
