@@ -2,7 +2,6 @@
 fastapi
 uvicorn[standard]
 openai
-google-generativeai
 mcp
 sqlmodel
 psycopg2-binary

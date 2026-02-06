@@ -15,7 +15,7 @@ from sqlmodel import Session
 from ..auth.dependencies import get_current_user
 from ..database import get_session
 from ..models import MessageRole
-from ..services.agent_service_gemini import (
+from ..services.agent_service import (
     AgentService,
     AgentRateLimitError,
     AgentAPIError,
@@ -105,11 +105,12 @@ async def chat(
         task_ops = TaskOperations(session)
         task_handlers = TaskHandlers(task_ops)
 
-        # Initialize AgentService with native Gemini SDK
+        # Initialize AgentService with Groq (FREE LLM)
         agent_service = AgentService(
             mcp_handlers=task_handlers,
-            api_key=os.getenv("GEMINI_API_KEY"),
-            model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
+            model=os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )
