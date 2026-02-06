@@ -157,14 +157,44 @@ class AgentService:
             )
         ]
 
-        # Initialize model
-        self.model = genai.GenerativeModel(
-            model_name=model,
-            tools=self.tools,
-            system_instruction=AGENT_INSTRUCTIONS
-        )
+        # Try multiple model names with fallback
+        model_names_to_try = [
+            model,  # User-specified model first
+            "gemini-pro",  # Most stable
+            "gemini-1.0-pro",  # Explicit version
+            "models/gemini-pro",  # With prefix
+            "gemini-1.5-pro",  # Newer version
+            "gemini-1.5-flash",  # Flash version
+        ]
 
-        logger.info(f"AgentService initialized with native Gemini model: {model}")
+        # Remove duplicates while preserving order
+        seen = set()
+        model_names_to_try = [x for x in model_names_to_try if not (x in seen or seen.add(x))]
+
+        initialized = False
+        last_error = None
+
+        for model_name in model_names_to_try:
+            try:
+                logger.info(f"Trying to initialize Gemini model: {model_name}")
+                self.model = genai.GenerativeModel(
+                    model_name=model_name,
+                    tools=self.tools,
+                    system_instruction=AGENT_INSTRUCTIONS
+                )
+                self.model_name = model_name
+                initialized = True
+                logger.info(f"✅ Successfully initialized with model: {model_name}")
+                break
+            except Exception as e:
+                last_error = e
+                logger.warning(f"❌ Failed to initialize {model_name}: {str(e)}")
+                continue
+
+        if not initialized:
+            error_msg = f"Failed to initialize any Gemini model. Last error: {last_error}"
+            logger.error(error_msg)
+            raise AgentAPIError(error_msg)
 
     async def _execute_tool(
         self,
