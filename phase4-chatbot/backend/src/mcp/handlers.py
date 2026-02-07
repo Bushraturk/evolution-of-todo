@@ -141,6 +141,14 @@ class TaskHandlers:
             Exception: If update fails
         """
         try:
+            # Validate task_id format (should be UUID-like)
+            if not task_id or len(task_id) < 20:
+                # If task_id looks like a title (too short), return helpful error
+                raise ValueError(
+                    f"Invalid task ID format. Please provide the task ID (not the title). "
+                    f"Use list_tasks to see all task IDs."
+                )
+
             # Delegate to TaskOperations
             task = await self.task_ops.update_task(
                 user_id=user_id,  # Keep as CUID string, not UUID

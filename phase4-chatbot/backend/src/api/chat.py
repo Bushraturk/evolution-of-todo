@@ -105,12 +105,12 @@ async def chat(
         task_ops = TaskOperations(session)
         task_handlers = TaskHandlers(task_ops)
 
-        # Initialize AgentService with Groq (FREE LLM)
+        # Initialize AgentService with Gemini (reliable function calling)
         agent_service = AgentService(
             mcp_handlers=task_handlers,
-            api_key=os.getenv("GROQ_API_KEY"),
-            base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
-            model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+            api_key=os.getenv("GEMINI_API_KEY"),
+            base_url=os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/"),
+            model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )
@@ -190,24 +190,32 @@ async def chat(
             result = await agent_service.run_conversation(messages, user_id)
         except AgentRateLimitError as e:
             logger.warning(f"Rate limit error for user {user_id}: {e}")
+            # Rollback any pending changes
+            session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail=str(e)
             )
         except AgentTimeoutError as e:
             logger.warning(f"Timeout error for user {user_id}: {e}")
+            # Rollback any pending changes
+            session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_504_GATEWAY_TIMEOUT,
                 detail=str(e)
             )
         except AgentAPIError as e:
             logger.error(f"API error for user {user_id}: {e}")
+            # Rollback any pending changes
+            session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail=str(e)
             )
         except Exception as e:
             logger.error(f"Unexpected error running agent: {e}", exc_info=True)
+            # Rollback any pending changes
+            session.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error processing request: {str(e)}"
