@@ -110,7 +110,7 @@ async def chat(
             mcp_handlers=task_handlers,
             api_key=os.getenv("GROQ_API_KEY"),
             base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
-            model=os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile"),
+            model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )
