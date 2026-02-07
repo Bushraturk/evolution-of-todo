@@ -110,7 +110,7 @@ async def chat(
             mcp_handlers=task_handlers,
             api_key=os.getenv("GEMINI_API_KEY"),
             base_url=os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/"),
-            model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp"),
+            model=os.getenv("GEMINI_MODEL", "gemini-3-flash-preview"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )

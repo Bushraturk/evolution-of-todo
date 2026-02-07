@@ -20,7 +20,7 @@ class Settings(BaseSettings):
         "GEMINI_BASE_URL",
         "https://generativelanguage.googleapis.com/v1beta/openai/"
     )
-    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
+    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
     # JWT Authentication (reuse from Phase III)
     jwt_secret: str = os.getenv("JWT_SECRET", "your-jwt-secret-key")
