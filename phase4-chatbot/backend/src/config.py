@@ -14,13 +14,13 @@ class Settings(BaseSettings):
         "postgresql://user:password@localhost:5432/database"
     )
 
-    # Gemini API Configuration (using OpenAI-compatible endpoint)
-    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
-    gemini_base_url: str = os.getenv(
-        "GEMINI_BASE_URL",
-        "https://generativelanguage.googleapis.com/v1beta/openai/"
+    # Groq API Configuration (using OpenAI-compatible endpoint)
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    groq_base_url: str = os.getenv(
+        "GROQ_BASE_URL",
+        "https://api.groq.com/openai/v1"
     )
-    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+    groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
     # JWT Authentication (reuse from Phase III)
     jwt_secret: str = os.getenv("JWT_SECRET", "your-jwt-secret-key")

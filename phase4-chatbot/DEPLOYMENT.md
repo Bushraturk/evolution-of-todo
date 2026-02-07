@@ -104,9 +104,9 @@ psql $DATABASE_URL -c "\dt"
 
    ```
    DATABASE_URL=postgresql://user:password@host/database
-   GEMINI_API_KEY=your-gemini-api-key-here
-   GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
-   GEMINI_MODEL=gemini-3-flash-preview
+   GROQ_API_KEY=your-groq-api-key-here
+   GROQ_BASE_URL=https://api.groq.com/openai/v1
+   GROQ_MODEL=llama-3.3-70b-versatile
    JWT_SECRET=your-jwt-secret-key
    JWT_ALGORITHM=HS256
    JWT_EXPIRATION_DAYS=7

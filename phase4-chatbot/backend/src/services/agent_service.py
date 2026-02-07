@@ -82,7 +82,7 @@ class AgentService:
         mcp_handlers,
         api_key: str = None,
         base_url: str = None,
-        model: str = "gemini-3-flash-preview",
+        model: str = "llama-3.3-70b-versatile",
         timeout: int = 30,
         max_retries: int = 3
     ):
@@ -90,9 +90,9 @@ class AgentService:
 
         Args:
             mcp_handlers: TaskHandlers instance for tool execution
-            api_key: Gemini API key
-            base_url: Gemini base URL
-            model: Gemini model name
+            api_key: Groq API key
+            base_url: Groq base URL
+            model: Groq model name (llama-3.3-70b-versatile)
             timeout: Request timeout
             max_retries: Maximum retry attempts
         """
@@ -101,12 +101,12 @@ class AgentService:
         self.timeout = timeout
         self.max_retries = max_retries
 
-        # Initialize AsyncOpenAI client for Gemini
+        # Initialize AsyncOpenAI client for Groq
         self.client = AsyncOpenAI(
-            api_key=api_key or os.getenv("GEMINI_API_KEY"),
+            api_key=api_key or os.getenv("GROQ_API_KEY"),
             base_url=base_url or os.getenv(
-                "GEMINI_BASE_URL",
-                "https://generativelanguage.googleapis.com/v1beta/openai/"
+                "GROQ_BASE_URL",
+                "https://api.groq.com/openai/v1"
             ),
             timeout=timeout,
             max_retries=max_retries

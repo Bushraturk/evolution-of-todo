@@ -103,7 +103,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "todo-chatbot",
-        "llm": os.getenv("GEMINI_MODEL", "gemini-3-flash-preview"),
+        "llm": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
         "framework": "openai-agents-sdk"
     }
 

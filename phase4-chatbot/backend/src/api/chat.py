@@ -105,12 +105,12 @@ async def chat(
         task_ops = TaskOperations(session)
         task_handlers = TaskHandlers(task_ops)
 
-        # Initialize AgentService with Gemini (reliable function calling)
+        # Initialize AgentService with Groq (FREE LLM with function calling)
         agent_service = AgentService(
             mcp_handlers=task_handlers,
-            api_key=os.getenv("GEMINI_API_KEY"),
-            base_url=os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/"),
-            model=os.getenv("GEMINI_MODEL", "gemini-3-flash-preview"),
+            api_key=os.getenv("GROQ_API_KEY"),
+            base_url=os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1"),
+            model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
             timeout=int(os.getenv("LLM_REQUEST_TIMEOUT", "30")),
             max_retries=int(os.getenv("LLM_MAX_RETRIES", "3"))
         )
