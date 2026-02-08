@@ -1,0 +1,120 @@
+# Frontend Dockerfile Template
+
+# This Dockerfile uses multi-stage builds to optimize image size
+# Stage 1: Dependencies - Install node_modules
+# Stage 2: Builder - Build Next.js application
+# Stage 3: Runner - Run production server
+
+# ============================================
+# Stage 1: Dependencies
+# ============================================
+FROM node:20-alpine AS deps
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files first (for layer caching)
+COPY package.json package-lock.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# ============================================
+# Stage 2: Builder
+# ============================================
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json package-lock.json ./
+
+# Install all dependencies (including devDependencies)
+RUN npm ci
+
+# Copy application source code
+COPY . .
+
+# Build Next.js application
+# This creates .next directory with optimized production build
+RUN npm run build
+
+# ============================================
+# Stage 3: Runner
+# ============================================
+FROM node:20-alpine AS runner
+
+# Set working directory
+WORKDIR /app
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app
+
+# Copy public assets
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Copy Next.js standalone output (includes only necessary files)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Copy static files
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Switch to non-root user
+USER nextjs
+
+# Expose application port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 1
+
+# Run application
+CMD ["node", "server.js"]
+
+# ============================================
+# Build Instructions
+# ============================================
+# Build: docker build -t todo-frontend:latest -f k8s/dockerfiles/frontend.Dockerfile phase4-chatbot/frontend/
+# Run:   docker run -p 3000:3000 --env-file .env.local todo-frontend:latest
+# Size:  Target <200MB
+
+# ============================================
+# Optimization Notes
+# ============================================
+# - Multi-stage build separates dependencies, build, and runtime
+# - node:20-alpine base image (~50MB) vs node:20 (~1GB)
+# - Next.js standalone output reduces size by excluding node_modules
+# - Only production dependencies included in final image
+# - Non-root user (nextjs) for security
+# - Layer caching: package files copied before source code
+# - Health check ensures container is healthy
+
+# ============================================
+# Next.js Configuration Required
+# ============================================
+# Add to next.config.js:
+# module.exports = {
+#   output: 'standalone',  // Enable standalone output
+# }
+
+# ============================================
+# Environment Variables Required
+# ============================================
+# NEXT_PUBLIC_API_URL - Backend API URL (e.g., http://backend:8000)
+# NODE_ENV - Node environment (production)
+
+# ============================================
+# Notes
+# ============================================
+# - Standalone output includes only necessary files for production
+# - Static files (.next/static) must be copied separately
+# - Public assets must be copied separately
+# - Server-Side Rendering (SSR) requires Node.js runtime
+# - For static export (no SSR), use nginx instead of Node.js

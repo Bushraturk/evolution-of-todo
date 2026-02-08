@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    {{- include "todo-chatbot.backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "todo-chatbot.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "todo-chatbot.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "todo-chatbot.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: {{ .Values.backend.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.backend.securityContext.runAsUser }}
+        fsGroup: {{ .Values.backend.securityContext.fsGroup }}
+      containers:
+      - name: backend
+        image: {{ include "todo-chatbot.backend.image" . }}
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.backend.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: LOG_LEVEL
+          value: {{ .Values.backend.env.LOG_LEVEL | quote }}
+        - name: CORS_ORIGINS
+          value: {{ .Values.backend.env.CORS_ORIGINS | quote }}
+        - name: MAX_CONVERSATION_HISTORY
+          value: {{ .Values.backend.env.MAX_CONVERSATION_HISTORY | quote }}
+        - name: CONVERSATION_ARCHIVE_DAYS
+          value: {{ .Values.backend.env.CONVERSATION_ARCHIVE_DAYS | quote }}
+        - name: LLM_REQUEST_TIMEOUT
+          value: {{ .Values.backend.env.LLM_REQUEST_TIMEOUT | quote }}
+        - name: LLM_MAX_RETRIES
+          value: {{ .Values.backend.env.LLM_MAX_RETRIES | quote }}
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: todo-secrets
+              key: DATABASE_URL
+        - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: todo-secrets
+              key: GROQ_API_KEY
+        - name: GROQ_BASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: todo-secrets
+              key: GROQ_BASE_URL
+        - name: GROQ_MODEL
+          valueFrom:
+            secretKeyRef:
+              name: todo-secrets
+              key: GROQ_MODEL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: todo-secrets
+              key: JWT_SECRET
+        {{- if .Values.backend.healthCheck.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backend.healthCheck.livenessProbe.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.backend.healthCheck.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.healthCheck.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.backend.healthCheck.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.backend.healthCheck.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.backend.healthCheck.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.healthCheck.readinessProbe.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.backend.healthCheck.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.healthCheck.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.backend.healthCheck.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.backend.healthCheck.readinessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.backend.healthCheck.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.backend.healthCheck.startupProbe.path }}
+            port: http
+          initialDelaySeconds: {{ .Values.backend.healthCheck.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.healthCheck.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.backend.healthCheck.startupProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.backend.healthCheck.startupProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        securityContext:
+          capabilities:
+            drop:
+            {{- range .Values.backend.securityContext.capabilities.drop }}
+            - {{ . }}
+            {{- end }}

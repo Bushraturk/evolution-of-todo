@@ -1,0 +1,56 @@
+# Development environment overrides for todo-chatbot
+# These values override the defaults in values.yaml for local development
+
+global:
+  environment: development
+  domain: localhost
+
+backend:
+  image:
+    tag: latest
+    pullPolicy: Always  # Always pull latest for development
+
+  replicas: 1
+
+  env:
+    LOG_LEVEL: DEBUG  # More verbose logging for development
+    CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+
+  resources:
+    requests:
+      cpu: 50m      # Lower resource requests for local development
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+frontend:
+  image:
+    tag: latest
+    pullPolicy: Always  # Always pull latest for development
+
+  replicas: 1
+
+  env:
+    NEXT_PUBLIC_API_URL: "http://backend:8000"
+    NODE_ENV: development
+
+  resources:
+    requests:
+      cpu: 25m      # Lower resource requests for local development
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  service:
+    type: LoadBalancer  # Use LoadBalancer for Minikube tunnel
+    port: 80
+
+# Development secrets (override with actual values)
+secrets:
+  DATABASE_URL: "postgresql://user:pass@localhost:5432/todo_dev"
+  GROQ_API_KEY: "your-dev-api-key"
+  JWT_SECRET: "dev-secret-key-change-in-production"
+  GROQ_BASE_URL: "https://api.groq.com/openai/v1"
+  GROQ_MODEL: "llama-3.3-70b-versatile"

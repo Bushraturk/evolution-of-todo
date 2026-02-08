@@ -1,0 +1,112 @@
+# Production environment overrides for todo-chatbot
+# These values override the defaults in values.yaml for production deployment
+
+global:
+  environment: production
+  domain: todo-chatbot.example.com
+
+backend:
+  image:
+    tag: v1.0.0  # Use specific version tags in production
+    pullPolicy: IfNotPresent
+
+  replicas: 3  # Multiple replicas for high availability
+
+  env:
+    LOG_LEVEL: INFO  # Less verbose logging for production
+    CORS_ORIGINS: "https://todo-chatbot.example.com"
+    MAX_CONVERSATION_HISTORY: "100"
+    CONVERSATION_ARCHIVE_DAYS: "180"
+
+  resources:
+    requests:
+      cpu: 200m      # Higher resource requests for production
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  healthCheck:
+    livenessProbe:
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 2
+
+frontend:
+  image:
+    tag: v1.0.0  # Use specific version tags in production
+    pullPolicy: IfNotPresent
+
+  replicas: 2  # Multiple replicas for high availability
+
+  env:
+    NEXT_PUBLIC_API_URL: "https://api.todo-chatbot.example.com"
+    NODE_ENV: production
+
+  resources:
+    requests:
+      cpu: 100m      # Higher resource requests for production
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  service:
+    type: LoadBalancer  # Use LoadBalancer with cloud provider
+    port: 443  # HTTPS in production
+
+  healthCheck:
+    livenessProbe:
+      initialDelaySeconds: 15
+      periodSeconds: 15
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 2
+
+# Production secrets (MUST be overridden with actual values)
+secrets:
+  DATABASE_URL: ""  # Set via kubectl create secret or CI/CD
+  GROQ_API_KEY: ""  # Set via kubectl create secret or CI/CD
+  JWT_SECRET: ""    # Set via kubectl create secret or CI/CD
+  GROQ_BASE_URL: "https://api.groq.com/openai/v1"
+  GROQ_MODEL: "llama-3.3-70b-versatile"
+
+# Enable autoscaling in production
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Enable pod disruption budget in production
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Ingress configuration for production
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: todo-chatbot.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: todo-chatbot-tls
+      hosts:
+        - todo-chatbot.example.com

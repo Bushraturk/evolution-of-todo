@@ -1,0 +1,177 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your Todo Chatbot application has been deployed to Kubernetes.
+
+========================================
+DEPLOYMENT INFORMATION
+========================================
+
+Release Name:   {{ .Release.Name }}
+Namespace:      {{ .Release.Namespace }}
+Chart Version:  {{ .Chart.Version }}
+App Version:    {{ .Chart.AppVersion }}
+
+========================================
+ACCESSING THE APPLICATION
+========================================
+
+{{- if eq .Values.frontend.service.type "LoadBalancer" }}
+
+1. Get the LoadBalancer IP:
+
+   kubectl get service frontend -n {{ .Release.Namespace }}
+
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+
+2. For Minikube, start the tunnel in a separate terminal:
+
+   minikube tunnel
+
+3. Access the application:
+
+   http://localhost (if using Minikube tunnel)
+   or
+   http://<EXTERNAL-IP> (if LoadBalancer IP is assigned)
+
+{{- else if eq .Values.frontend.service.type "NodePort" }}
+
+1. Get the NodePort:
+
+   export NODE_PORT=$(kubectl get service frontend -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+   export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+
+2. Access the application:
+
+   echo "http://$NODE_IP:$NODE_PORT"
+
+{{- else }}
+
+1. Use port forwarding to access the application:
+
+   kubectl port-forward service/frontend 3000:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
+
+2. Access the application:
+
+   http://localhost:3000
+
+{{- end }}
+
+========================================
+CHECKING DEPLOYMENT STATUS
+========================================
+
+1. Check pod status:
+
+   kubectl get pods -n {{ .Release.Namespace }}
+
+2. Check service status:
+
+   kubectl get services -n {{ .Release.Namespace }}
+
+3. View backend logs:
+
+   kubectl logs -l app.kubernetes.io/component=backend -n {{ .Release.Namespace }}
+
+4. View frontend logs:
+
+   kubectl logs -l app.kubernetes.io/component=frontend -n {{ .Release.Namespace }}
+
+========================================
+HEALTH CHECKS
+========================================
+
+Backend health endpoint:  http://backend:{{ .Values.backend.service.port }}/health
+Frontend health endpoint: http://frontend:{{ .Values.frontend.service.port }}/api/health
+
+Test from within the cluster:
+
+   kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
+     curl http://backend:{{ .Values.backend.service.port }}/health
+
+========================================
+SCALING THE APPLICATION
+========================================
+
+Scale backend:
+
+   kubectl scale deployment backend --replicas=3 -n {{ .Release.Namespace }}
+
+Scale frontend:
+
+   kubectl scale deployment frontend --replicas=2 -n {{ .Release.Namespace }}
+
+========================================
+UPDATING THE APPLICATION
+========================================
+
+1. Update values and upgrade:
+
+   helm upgrade {{ .Release.Name }} ./helm-charts/todo-chatbot/ \
+     --set backend.image.tag=v1.0.1
+
+2. Check rollout status:
+
+   kubectl rollout status deployment/backend -n {{ .Release.Namespace }}
+
+3. Rollback if needed:
+
+   helm rollback {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+========================================
+TROUBLESHOOTING
+========================================
+
+If pods are not starting:
+
+1. Check pod events:
+
+   kubectl describe pod <pod-name> -n {{ .Release.Namespace }}
+
+2. Check pod logs:
+
+   kubectl logs <pod-name> -n {{ .Release.Namespace }}
+
+3. Verify secrets are created:
+
+   kubectl get secrets -n {{ .Release.Namespace }}
+
+4. Check resource availability:
+
+   kubectl top nodes
+   kubectl top pods -n {{ .Release.Namespace }}
+
+Common issues:
+
+- ImagePullBackOff: Images not loaded to Minikube
+  Solution: minikube image load <image-name>
+
+- CrashLoopBackOff: Application error or missing config
+  Solution: Check logs with kubectl logs
+
+- Pending: Insufficient cluster resources
+  Solution: Increase Minikube resources or reduce pod requests
+
+========================================
+CLEANUP
+========================================
+
+To uninstall the release:
+
+   helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+To delete secrets:
+
+   kubectl delete secret todo-secrets -n {{ .Release.Namespace }}
+
+========================================
+DOCUMENTATION
+========================================
+
+For more information, see:
+- Deployment Guide: k8s/docs/DEPLOYMENT.md
+- Troubleshooting: k8s/docs/TROUBLESHOOTING.md
+- AI Tools Guide: k8s/docs/AI_TOOLS_GUIDE.md
+
+========================================
+
+Happy deploying! 🚀
