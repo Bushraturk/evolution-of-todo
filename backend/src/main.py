@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .api.routes import categories, tasks, auth, reminders, events
+from .api.routes import categories, tasks, auth, reminders, events, dapr_subscriptions
 from .config import get_settings
 from .database import init_db
 
@@ -64,5 +64,6 @@ app.include_router(categories.router)
 app.include_router(auth.router)
 app.include_router(reminders.router)
 app.include_router(events.router)
+app.include_router(dapr_subscriptions.router)
 
 # run backend command: uvicorn src.main:app --reload --port 8001
