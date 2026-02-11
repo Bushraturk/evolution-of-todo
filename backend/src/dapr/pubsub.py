@@ -47,19 +47,48 @@ class DaprPubSubClient:
         url = f"{self.dapr_url}/v1.0/publish/{self.pubsub_name}/{topic}"
 
         try:
+            # Log event publishing attempt
+            event_type = data.get('event_type', 'unknown')
+            logger.info(f"Publishing event to topic '{topic}': type={event_type}")
+
             response = await self.client.post(
                 url,
                 json=data,
                 headers={"Content-Type": "application/json"},
             )
             response.raise_for_status()
-            logger.info(f"Published event to topic '{topic}': {data.get('event_type')}")
-        except httpx.HTTPError as e:
-            logger.error(f"Failed to publish event to topic '{topic}': {e}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Failed to publish event: {str(e)}",
+
+            logger.info(f"Successfully published event to topic '{topic}': type={event_type}")
+
+        except httpx.ConnectError as e:
+            # Kafka/Dapr connection failure
+            logger.error(
+                f"Connection error publishing to topic '{topic}': {e}. "
+                "Dapr sidecar may not be running or Kafka may be unavailable."
             )
+            # Don't raise - allow graceful degradation
+            # Events will be caught by safety net mechanisms
+
+        except httpx.TimeoutException as e:
+            # Timeout publishing event
+            logger.error(f"Timeout publishing event to topic '{topic}': {e}")
+            # Don't raise - allow graceful degradation
+
+        except httpx.HTTPStatusError as e:
+            # HTTP error from Dapr
+            logger.error(
+                f"HTTP error publishing to topic '{topic}': "
+                f"status={e.response.status_code}, detail={e.response.text}"
+            )
+            # Don't raise - allow graceful degradation
+
+        except Exception as e:
+            # Unexpected error
+            logger.error(
+                f"Unexpected error publishing event to topic '{topic}': {e}",
+                exc_info=True
+            )
+            # Don't raise - allow graceful degradation
 
     async def close(self) -> None:
         """Close the HTTP client."""
