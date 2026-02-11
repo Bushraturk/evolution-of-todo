@@ -9,6 +9,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .category import Category
+    from .recurring_pattern import RecurringPattern
 
 
 class Priority(str, Enum):
@@ -29,6 +30,12 @@ class TaskBase(SQLModel):
     category_id: Optional[UUID] = Field(default=None, foreign_key="category.id")
     user_id: str = Field(index=True)  # User ID from Better Auth (CUID format)
 
+    # Advanced features (Phase VI)
+    due_date: Optional[datetime] = Field(default=None, index=True)
+    is_recurring: bool = Field(default=False)
+    parent_task_id: Optional[UUID] = Field(default=None, foreign_key="task.id")
+    recurrence_id: Optional[UUID] = Field(default=None, foreign_key="recurring_pattern.id")
+
 
 class Task(TaskBase, table=True):
     """Task database model."""
@@ -39,6 +46,9 @@ class Task(TaskBase, table=True):
 
     # Relationship to Category
     category: Optional["Category"] = Relationship(back_populates="tasks")
+
+    # Relationship to RecurringPattern
+    recurrence: Optional["RecurringPattern"] = Relationship(back_populates="tasks")
 
     def __repr__(self) -> str:
         return f"Task(id={self.id}, title='{self.title}', completed={self.completed})"

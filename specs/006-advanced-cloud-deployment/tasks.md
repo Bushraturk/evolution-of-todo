@@ -23,10 +23,10 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create Dapr configuration directory structure at `dapr/components/`
-- [ ] T002 [P] Update backend dependencies in `backend/pyproject.toml` (add aiokafka, dapr-ext-fastapi, resend)
-- [ ] T003 [P] Update frontend dependencies in `frontend/package.json` (add date-fns)
-- [ ] T004 [P] Create environment variable template at `backend/.env.example` with Kafka, Dapr, Resend config
+- [X] T001 Create Dapr configuration directory structure at `dapr/components/`
+- [X] T002 [P] Update backend dependencies in `backend/pyproject.toml` (add aiokafka, dapr-ext-fastapi, resend)
+- [X] T003 [P] Update frontend dependencies in `frontend/package.json` (add date-fns)
+- [X] T004 [P] Create environment variable template at `backend/.env.example` with Kafka, Dapr, Resend config
 - [ ] T005 Install Dapr CLI and initialize locally (verify with `dapr --version`)
 
 ---
@@ -39,37 +39,37 @@
 
 ### Database Schema Extensions
 
-- [ ] T006 Create Alembic migration for new columns in tasks table (priority, due_date, is_recurring, parent_task_id, recurrence_id) in `backend/alembic/versions/`
-- [ ] T007 [P] Create Alembic migration for recurring_patterns table in `backend/alembic/versions/`
-- [ ] T008 [P] Create Alembic migration for reminders table in `backend/alembic/versions/`
-- [ ] T009 [P] Create Alembic migration for scheduled_notifications table in `backend/alembic/versions/`
-- [ ] T010 [P] Create Alembic migration for tags table in `backend/alembic/versions/`
-- [ ] T011 [P] Create Alembic migration for task_tags junction table in `backend/alembic/versions/`
+- [X] T006 Create Alembic migration for new columns in tasks table (priority, due_date, is_recurring, parent_task_id, recurrence_id) in `backend/alembic/versions/`
+- [X] T007 [P] Create Alembic migration for recurring_patterns table in `backend/alembic/versions/`
+- [X] T008 [P] Create Alembic migration for reminders table in `backend/alembic/versions/`
+- [X] T009 [P] Create Alembic migration for scheduled_notifications table in `backend/alembic/versions/`
+- [X] T010 [P] Create Alembic migration for tags table in `backend/alembic/versions/`
+- [X] T011 [P] Create Alembic migration for task_tags junction table in `backend/alembic/versions/`
 - [ ] T012 Run all migrations and verify schema in Neon DB
 
 ### Data Models
 
-- [ ] T013 [P] Extend Task model in `backend/src/models/task.py` with priority, due_date, is_recurring, parent_task_id, recurrence_id fields
-- [ ] T014 [P] Create RecurringPattern model in `backend/src/models/recurring_pattern.py`
-- [ ] T015 [P] Create Reminder model in `backend/src/models/reminder.py`
-- [ ] T016 [P] Create ScheduledNotification model in `backend/src/models/notification.py`
-- [ ] T017 [P] Create Tag model in `backend/src/models/tag.py`
-- [ ] T018 [P] Create TaskTag model in `backend/src/models/task_tag.py`
+- [X] T013 [P] Extend Task model in `backend/src/models/task.py` with priority, due_date, is_recurring, parent_task_id, recurrence_id fields
+- [X] T014 [P] Create RecurringPattern model in `backend/src/models/recurring_pattern.py`
+- [X] T015 [P] Create Reminder model in `backend/src/models/reminder.py`
+- [X] T016 [P] Create ScheduledNotification model in `backend/src/models/notification.py`
+- [X] T017 [P] Create Tag model in `backend/src/models/tag.py`
+- [X] T018 [P] Create TaskTag model in `backend/src/models/task_tag.py`
 
 ### Dapr Infrastructure
 
-- [ ] T019 Create Dapr pub/sub component for Kafka/Redpanda in `dapr/components/pubsub.yaml`
-- [ ] T020 [P] Create Dapr state store component for Redis in `dapr/components/statestore.yaml`
-- [ ] T021 [P] Create Dapr secrets component in `dapr/components/secrets.yaml`
-- [ ] T022 [P] Create Dapr cron binding component in `dapr/components/cron-binding.yaml`
-- [ ] T023 Create secrets file template at `dapr/secrets.json.example`
-- [ ] T024 Create Dapr pub/sub client wrapper in `backend/src/dapr/pubsub.py`
-- [ ] T025 [P] Create Dapr state management client in `backend/src/dapr/state.py`
+- [X] T019 Create Dapr pub/sub component for Kafka/Redpanda in `dapr/components/pubsub.yaml`
+- [X] T020 [P] Create Dapr state store component for Redis in `dapr/components/statestore.yaml`
+- [X] T021 [P] Create Dapr secrets component in `dapr/components/secrets.yaml`
+- [X] T022 [P] Create Dapr cron binding component in `dapr/components/cron-binding.yaml`
+- [X] T023 Create secrets file template at `dapr/secrets.json.example`
+- [X] T024 Create Dapr pub/sub client wrapper in `backend/src/dapr/pubsub.py`
+- [X] T025 [P] Create Dapr state management client in `backend/src/dapr/state.py`
 
 ### Event Publishing Infrastructure
 
-- [ ] T026 Create event publisher service in `backend/src/services/event_publisher.py` with publish_event() method
-- [ ] T027 Define event schemas (TaskCreatedEvent, TaskCompletedEvent, ReminderScheduledEvent) in `backend/src/models/events.py`
+- [X] T026 Create event publisher service in `backend/src/services/event_publisher.py` with publish_event() method
+- [X] T027 Define event schemas (TaskCreatedEvent, TaskCompletedEvent, ReminderScheduledEvent) in `backend/src/models/events.py`
 - [ ] T028 Create Kafka topics (task-events, reminders, task-updates) in Redpanda Cloud or local
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
@@ -84,18 +84,18 @@
 
 ### Implementation for User Story 1
 
-- [ ] T029 [P] [US1] Extend TaskService in `backend/src/services/task_service.py` with create_recurring_task() method
-- [ ] T030 [P] [US1] Create RecurringPatternService in `backend/src/services/recurring_pattern_service.py` with calculate_next_occurrence() method
-- [ ] T031 [US1] Extend POST /tasks endpoint in `backend/src/api/routes/tasks.py` to accept recurrence field
-- [ ] T032 [US1] Add validation for recurrence fields (frequency, interval, end_date) in `backend/src/api/routes/tasks.py`
-- [ ] T033 [US1] Publish task.created event when recurring task is created in `backend/src/services/task_service.py`
-- [ ] T034 [US1] Create Recurring Task Service consumer in `backend/src/services/recurring_task_service.py`
-- [ ] T035 [US1] Implement event handler for task.completed events in `backend/src/services/recurring_task_service.py`
-- [ ] T036 [US1] Implement create_next_occurrence() logic in `backend/src/services/recurring_task_service.py`
-- [ ] T037 [US1] Add idempotency check (unique constraint on parent_task_id + next_occurrence_date) in create_next_occurrence()
-- [ ] T038 [US1] Implement cron safety net job in `backend/src/services/recurring_task_service.py` (runs every 5 minutes)
-- [ ] T039 [US1] Create GET /tasks/:id/occurrences endpoint in `backend/src/api/routes/tasks.py`
-- [ ] T040 [US1] Create DELETE /tasks/:id/recurrence endpoint in `backend/src/api/routes/tasks.py`
+- [X] T029 [P] [US1] Extend TaskService in `backend/src/services/task_service.py` with create_recurring_task() method
+- [X] T030 [P] [US1] Create RecurringPatternService in `backend/src/services/recurring_pattern_service.py` with calculate_next_occurrence() method
+- [X] T031 [US1] Extend POST /tasks endpoint in `backend/src/api/routes/tasks.py` to accept recurrence field
+- [X] T032 [US1] Add validation for recurrence fields (frequency, interval, end_date) in `backend/src/api/routes/tasks.py`
+- [X] T033 [US1] Publish task.created event when recurring task is created in `backend/src/services/task_service.py`
+- [X] T034 [US1] Create Recurring Task Service consumer in `backend/src/services/recurring_task_service.py`
+- [X] T035 [US1] Implement event handler for task.completed events in `backend/src/services/recurring_task_service.py`
+- [X] T036 [US1] Implement create_next_occurrence() logic in `backend/src/services/recurring_task_service.py`
+- [X] T037 [US1] Add idempotency check (unique constraint on parent_task_id + next_occurrence_date) in create_next_occurrence()
+- [X] T038 [US1] Implement cron safety net job in `backend/src/services/recurring_task_service.py` (runs every 5 minutes)
+- [X] T039 [US1] Create GET /tasks/:id/occurrences endpoint in `backend/src/api/routes/tasks.py`
+- [X] T040 [US1] Create DELETE /tasks/:id/recurrence endpoint in `backend/src/api/routes/tasks.py`
 - [ ] T041 [P] [US1] Create RecurrenceSelector component in `frontend/src/components/RecurrenceSelector.tsx`
 - [ ] T042 [US1] Integrate RecurrenceSelector into task creation form in `frontend/src/components/TaskForm.tsx`
 - [ ] T043 [US1] Update taskService.ts to include recurrence field in `frontend/src/services/taskService.ts`
@@ -103,10 +103,10 @@
 
 ### Tests for User Story 1
 
-- [ ] T045 [P] [US1] Unit test for calculate_next_occurrence() in `backend/tests/unit/test_recurring_pattern.py`
-- [ ] T046 [P] [US1] Integration test for recurring task creation flow in `backend/tests/integration/test_recurring_task_creation.py`
-- [ ] T047 [P] [US1] Integration test for next occurrence generation in `backend/tests/integration/test_next_occurrence.py`
-- [ ] T048 [P] [US1] Contract test for POST /tasks with recurrence in `backend/tests/contract/test_tasks_api.py`
+- [X] T045 [P] [US1] Unit test for calculate_next_occurrence() in `backend/tests/unit/test_recurring_pattern.py`
+- [X] T046 [P] [US1] Integration test for recurring task creation flow in `backend/tests/integration/test_recurring_task_creation.py`
+- [X] T047 [P] [US1] Integration test for next occurrence generation in `backend/tests/integration/test_next_occurrence.py`
+- [X] T048 [P] [US1] Contract test for POST /tasks with recurrence in `backend/tests/contract/test_tasks_api.py`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

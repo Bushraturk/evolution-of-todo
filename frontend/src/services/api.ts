@@ -164,6 +164,48 @@ export const taskApi = {
     );
     return response.data;
   },
+
+  /**
+   * Get all occurrences of a recurring task.
+   */
+  async getOccurrences(id: string): Promise<{
+    parent_task: { id: string; title: string; is_recurring: boolean };
+    occurrences: Array<{
+      id: string;
+      due_date: string;
+      completed: boolean;
+      completed_at?: string;
+    }>;
+    total: number;
+    next_occurrence_date?: string;
+  }> {
+    return fetchApi(`/api/tasks/${id}/occurrences`);
+  },
+
+  /**
+   * Stop recurrence for a recurring task.
+   */
+  async stopRecurrence(
+    id: string,
+    options?: { delete_future?: boolean; delete_all?: boolean }
+  ): Promise<{
+    message: string;
+    deleted_count: number;
+    task: { id: string; is_recurring: boolean; recurrence: null };
+  }> {
+    const params = new URLSearchParams();
+    if (options?.delete_future !== undefined) {
+      params.append('delete_future', String(options.delete_future));
+    }
+    if (options?.delete_all !== undefined) {
+      params.append('delete_all', String(options.delete_all));
+    }
+
+    const query = params.toString();
+    return fetchApi(`/api/tasks/${id}/recurrence${query ? `?${query}` : ''}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 /**

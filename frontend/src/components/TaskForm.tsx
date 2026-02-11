@@ -3,10 +3,20 @@
 import { useState, useEffect } from 'react';
 import type { Priority, Category, CreateTaskRequest } from '@/types/task';
 import { taskApi, categoryApi } from '@/services/api';
+import RecurrenceSelector from './RecurrenceSelector';
+import DateTimePicker from './DateTimePicker';
 
 interface TaskFormProps {
   onSuccess: () => void;
   onCancel: () => void;
+}
+
+interface RecurrenceConfig {
+  frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  interval: number;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
+  endDate?: string;
 }
 
 export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
@@ -14,6 +24,8 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [categoryId, setCategoryId] = useState<string>('');
+  const [dueDate, setDueDate] = useState<string | null>(null);
+  const [recurrence, setRecurrence] = useState<RecurrenceConfig | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +58,8 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
         description: description.trim() || undefined,
         priority,
         category_id: categoryId || undefined,
+        due_date: dueDate || undefined,
+        recurrence: recurrence || undefined,
       };
       await taskApi.create(request);
       onSuccess();
@@ -138,6 +152,19 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
             </select>
           </div>
         </div>
+
+        {/* Due Date */}
+        <DateTimePicker
+          value={dueDate}
+          onChange={setDueDate}
+          label="Due date"
+        />
+
+        {/* Recurrence */}
+        <RecurrenceSelector
+          value={recurrence}
+          onChange={setRecurrence}
+        />
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4">

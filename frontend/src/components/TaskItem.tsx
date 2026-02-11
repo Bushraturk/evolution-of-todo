@@ -64,6 +64,16 @@ export default function TaskItem({ task, onUpdate, onEdit, onDelete }: TaskItemP
             {task.title}
           </h3>
 
+          {/* Recurring Task Indicator */}
+          {task.is_recurring && (
+            <span
+              className="px-2 py-0.5 text-xs font-medium rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 dark:from-blue-900/50 dark:to-cyan-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+              title="Recurring task"
+            >
+              🔄 Recurring
+            </span>
+          )}
+
           {/* Priority Badge */}
           <span
             className={`px-2 py-0.5 text-xs font-medium rounded-full ${
@@ -94,6 +104,13 @@ export default function TaskItem({ task, onUpdate, onEdit, onDelete }: TaskItemP
             }`}
           >
             {task.description}
+          </p>
+        )}
+
+        {/* Due Date Display */}
+        {task.due_date && (
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            📅 Due: {new Date(task.due_date).toLocaleString()}
           </p>
         )}
 

@@ -1,0 +1,21 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: todo-pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "localhost:19092"
+  - name: authType
+    value: "none"
+  - name: consumerGroup
+    value: "todo-service"
+  - name: clientId
+    value: "todo-api"
+scopes:
+- todo-api
+- recurring-task-service
+- notification-service
+- audit-service
