@@ -13,7 +13,7 @@ This project is part of the "Evolution of Todo" hackathon, showcasing Spec-Drive
 | Phase III | User Authentication & Multi-User Support | ✅ COMPLETE |
 | Phase IV | AI-Powered Chatbot | ✅ COMPLETE |
 | Phase V | Local Kubernetes Deployment | ✅ COMPLETE |
-| Phase VI | Cloud-Native Distributed System | Planned |
+| Phase VI | Advanced Cloud Deployment | ✅ COMPLETE |
 
 ## 🚀 Production Deployment
 
@@ -36,6 +36,184 @@ This project is part of the "Evolution of Todo" hackathon, showcasing Spec-Drive
 - Database: Neon DB PostgreSQL (already configured)
 
 **Security:** All secrets rotated and redacted from documentation. Use `.secrets.production.txt` for deployment (gitignored).
+
+---
+
+## Phase VI: Advanced Cloud Deployment
+
+Event-driven distributed system with Kafka messaging, Dapr integration, and advanced task management features.
+
+### Features
+
+**Recurring Tasks**:
+- Daily, weekly, and monthly recurrence patterns
+- Automatic next occurrence generation
+- Hybrid event-driven + cron safety net
+- Idempotency checks for duplicate prevention
+- End date support for limited recurrence
+
+**Due Dates & Reminders**:
+- Task due dates with timezone support
+- Email and push notification reminders
+- Configurable reminder offsets (5 min to 1 week before)
+- Retry logic with exponential backoff (max 3 retries)
+- Resend API integration for email delivery
+
+**Event-Driven Architecture**:
+- Kafka/Redpanda for event streaming
+- Task lifecycle events (created, updated, completed, deleted)
+- Audit service for event logging
+- Real-time event processing
+- Event-driven recurring task generation
+
+**Dapr Integration**:
+- Infrastructure abstraction via Dapr sidecars
+- Pub/sub for event messaging
+- State store for conversation state
+- Secrets management
+- Portable across cloud providers
+
+**Advanced Organization**:
+- Tag system with color coding
+- Advanced filtering (search, status, priority, tags)
+- Multi-criteria sorting
+- Task statistics dashboard
+- Full-text search in title and description
+
+**Performance & Security**:
+- Database indexes for common queries
+- Input validation and sanitization
+- XSS and SQL injection prevention
+- Graceful error handling
+- Comprehensive logging
+
+### Architecture
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Frontend  │────▶│   Backend   │────▶│  PostgreSQL │
+│  (Next.js)  │     │  (FastAPI)  │     │  (Database) │
+└─────────────┘     └──────┬──────┘     └─────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │ Dapr Sidecar│
+                    └──────┬──────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+   ┌────▼────┐      ┌─────▼─────┐     ┌─────▼─────┐
+   │  Kafka  │      │   Redis   │     │  Resend   │
+   │ (Events)│      │  (State)  │     │  (Email)  │
+   └─────────┘      └───────────┘     └───────────┘
+        │
+   ┌────▼────────────────────────┐
+   │  Event Consumers:           │
+   │  - Recurring Task Service   │
+   │  - Notification Service     │
+   │  - Audit Service            │
+   └─────────────────────────────┘
+```
+
+### Tech Stack
+
+- **Message Broker**: Kafka/Redpanda Cloud
+- **Service Mesh**: Dapr (Distributed Application Runtime)
+- **State Store**: Redis
+- **Email Service**: Resend API
+- **Event Processing**: Async Python with aiokafka
+- **Database**: PostgreSQL with Alembic migrations
+- **Frontend**: Next.js with TypeScript, date-fns
+
+### Quick Start
+
+#### Prerequisites
+
+- Docker Desktop
+- Python 3.13+
+- Node.js 20+
+- Dapr CLI (optional for local development)
+
+#### Local Development
+
+```bash
+# Backend setup
+cd backend
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+pip install -r requirements.txt
+
+# Run database migrations
+alembic upgrade head
+
+# Start backend
+uvicorn src.main:app --reload --port 8001
+
+# Frontend setup (new terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+#### With Dapr (Event-Driven Features)
+
+```bash
+# Install Dapr CLI
+curl -fsSL https://raw.githubusercontent.com/dapr/cli/master/install/install.sh | bash
+
+# Initialize Dapr
+dapr init
+
+# Run backend with Dapr sidecar
+dapr run --app-id todo-backend --app-port 8001 --dapr-http-port 3500 \
+  --components-path ./dapr/components \
+  -- uvicorn src.main:app --reload --port 8001
+
+# Run recurring task service
+dapr run --app-id recurring-task-service --dapr-http-port 3501 \
+  --components-path ./dapr/components \
+  -- python -m src.services.recurring_task_service
+
+# Run notification service
+dapr run --app-id notification-service --dapr-http-port 3502 \
+  --components-path ./dapr/components \
+  -- python -m src.services.notification_service
+```
+
+### API Endpoints
+
+**Tasks**:
+- `POST /api/tasks` - Create task (with recurrence and reminders)
+- `GET /api/tasks` - List tasks (with filtering and search)
+- `GET /api/tasks/:id/occurrences` - Get recurring task occurrences
+- `DELETE /api/tasks/:id/recurrence` - Stop recurrence
+
+**Reminders**:
+- `POST /api/tasks/:id/reminders` - Schedule reminder
+- `GET /api/tasks/:id/reminders` - Get task reminders
+- `DELETE /api/reminders/:id` - Delete reminder
+
+**Tags**:
+- `GET /api/tags` - List tags
+- `POST /api/tags` - Create tag
+- `PUT /api/tags/:id` - Update tag
+- `DELETE /api/tags/:id` - Delete tag
+
+**Stats**:
+- `GET /api/tasks/stats` - Get task statistics
+
+**Events** (Internal):
+- `GET /api/internal/events/topics` - List event topics
+- `GET /dapr/subscribe` - Dapr subscription configuration
+
+### Documentation
+
+Complete documentation available in `specs/006-advanced-cloud-deployment/`:
+
+- **[spec.md](specs/006-advanced-cloud-deployment/spec.md)**: Feature specifications
+- **[plan.md](specs/006-advanced-cloud-deployment/plan.md)**: Implementation plan
+- **[tasks.md](specs/006-advanced-cloud-deployment/tasks.md)**: Task breakdown (139 tasks)
+- **[research.md](specs/006-advanced-cloud-deployment/research.md)**: Technology decisions
+- **[quickstart.md](specs/006-advanced-cloud-deployment/quickstart.md)**: Setup guide
 
 ---
 

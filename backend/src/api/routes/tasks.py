@@ -74,6 +74,8 @@ async def create_task(
             description=request.description,
             priority=request.priority,
             category_id=request.category_id,
+            due_date=request.due_date,
+            recurrence=request.recurrence,
         )
         return SingleTaskResponse(
             data=TaskResponse.model_validate(task),
@@ -165,3 +167,46 @@ async def toggle_task(
         raise HTTPException(status_code=404, detail=str(e))
     except AccessDeniedError:
         raise HTTPException(status_code=404, detail="Task not found")
+
+
+@router.get("/{task_id}/occurrences")
+async def get_task_occurrences(
+    task_id: UUID,
+    current_user: dict = Depends(get_current_user),
+    service: TaskService = Depends(get_task_service),
+):
+    """Get all occurrences of a recurring task."""
+    try:
+        occurrences = service.get_task_occurrences(task_id, current_user["id"])
+        return occurrences
+    except TaskNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except AccessDeniedError:
+        raise HTTPException(status_code=404, detail="Task not found")
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/{task_id}/recurrence")
+async def stop_recurrence(
+    task_id: UUID,
+    delete_future: bool = Query(True, description="Delete all future occurrences"),
+    delete_all: bool = Query(False, description="Delete all occurrences including completed"),
+    current_user: dict = Depends(get_current_user),
+    service: TaskService = Depends(get_task_service),
+):
+    """Stop recurrence for a recurring task."""
+    try:
+        result = service.stop_recurrence(
+            task_id=task_id,
+            user_id=current_user["id"],
+            delete_future=delete_future,
+            delete_all=delete_all,
+        )
+        return result
+    except TaskNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except AccessDeniedError:
+        raise HTTPException(status_code=404, detail="Task not found")
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))

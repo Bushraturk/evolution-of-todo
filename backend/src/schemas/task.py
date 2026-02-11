@@ -1,7 +1,7 @@
 """Pydantic schemas for Task API requests and responses."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -20,6 +20,16 @@ class CategoryInTask(BaseModel):
         from_attributes = True
 
 
+class RecurrenceSchema(BaseModel):
+    """Schema for recurrence configuration."""
+
+    frequency: str = Field(..., description="DAILY, WEEKLY, or MONTHLY")
+    interval: int = Field(1, ge=1, description="Interval between occurrences")
+    day_of_week: Optional[int] = Field(None, ge=0, le=6, description="Day of week for weekly (0=Sunday)")
+    day_of_month: Optional[int] = Field(None, ge=1, le=31, description="Day of month for monthly")
+    end_date: Optional[datetime] = Field(None, description="Optional end date for recurrence")
+
+
 class TaskResponse(BaseModel):
     """Response schema for a single task."""
 
@@ -30,6 +40,10 @@ class TaskResponse(BaseModel):
     priority: Priority
     category_id: Optional[UUID]
     category: Optional[CategoryInTask]
+    due_date: Optional[datetime] = None
+    is_recurring: bool = False
+    parent_task_id: Optional[UUID] = None
+    recurrence_id: Optional[UUID] = None
     created_at: datetime
     updated_at: datetime
 
@@ -58,6 +72,8 @@ class CreateTaskRequest(BaseModel):
     description: Optional[str] = Field(None, max_length=1000)
     priority: Priority = Priority.MEDIUM
     category_id: Optional[UUID] = None
+    due_date: Optional[datetime] = None
+    recurrence: Optional[Dict[str, Any]] = None
 
 
 class UpdateTaskRequest(BaseModel):

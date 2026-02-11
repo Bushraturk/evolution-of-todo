@@ -18,8 +18,25 @@ export interface Task {
   priority: Priority;
   category_id: string | null;
   category: Category | null;
+  due_date: string | null;
+  is_recurring: boolean;
+  recurrence_id: string | null;
+  parent_task_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface RecurrenceRequest {
+  frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+  interval: number;
+  day_of_week?: number;
+  day_of_month?: number;
+  end_date?: string;
+}
+
+export interface ReminderRequest {
+  offset_minutes: number;
+  channel: 'EMAIL' | 'PUSH' | 'BOTH';
 }
 
 export interface CreateTaskRequest {
@@ -27,6 +44,9 @@ export interface CreateTaskRequest {
   description?: string;
   priority?: Priority;
   category_id?: string;
+  due_date?: string;
+  recurrence?: RecurrenceRequest;
+  reminder?: ReminderRequest;
 }
 
 export interface UpdateTaskRequest {
