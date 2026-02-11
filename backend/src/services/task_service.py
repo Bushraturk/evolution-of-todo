@@ -251,6 +251,27 @@ class TaskService:
         self.session.add(task)
         self.session.commit()
         self.session.refresh(task)
+
+        # Publish task.updated event
+        import asyncio
+        try:
+            task_data = {
+                "title": task.title,
+                "description": task.description,
+                "priority": task.priority.value,
+                "category_id": str(task.category_id) if task.category_id else None,
+            }
+            asyncio.create_task(
+                self.event_publisher.publish_task_updated(
+                    task_id=task.id,
+                    user_id=user_id,
+                    task_data=task_data,
+                )
+            )
+        except RuntimeError:
+            # No event loop running, skip event publishing
+            pass
+
         return task
 
     def toggle_complete(self, task_id: UUID, user_id: str) -> Task:

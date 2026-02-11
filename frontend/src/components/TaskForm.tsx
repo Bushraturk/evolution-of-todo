@@ -5,6 +5,7 @@ import type { Priority, Category, CreateTaskRequest } from '@/types/task';
 import { taskApi, categoryApi } from '@/services/api';
 import RecurrenceSelector from './RecurrenceSelector';
 import DateTimePicker from './DateTimePicker';
+import ReminderForm, { ReminderConfig } from './ReminderForm';
 
 interface TaskFormProps {
   onSuccess: () => void;
@@ -26,6 +27,7 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
   const [categoryId, setCategoryId] = useState<string>('');
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [recurrence, setRecurrence] = useState<RecurrenceConfig | null>(null);
+  const [reminder, setReminder] = useState<ReminderConfig | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +62,7 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
         category_id: categoryId || undefined,
         due_date: dueDate || undefined,
         recurrence: recurrence || undefined,
+        reminder: reminder || undefined,
       };
       await taskApi.create(request);
       onSuccess();
@@ -165,6 +168,15 @@ export default function TaskForm({ onSuccess, onCancel }: TaskFormProps) {
           value={recurrence}
           onChange={setRecurrence}
         />
+
+        {/* Reminder */}
+        {dueDate && (
+          <ReminderForm
+            value={reminder}
+            onChange={setReminder}
+            disabled={!dueDate}
+          />
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4">
